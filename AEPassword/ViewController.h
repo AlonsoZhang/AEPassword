@@ -8,7 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface ViewController : NSViewController
+@interface ViewController : NSViewController{
+    NSMutableDictionary *InfoConfig;
+    NSTimer *updataTime;
+}
 
 @property (unsafe_unretained) IBOutlet NSTextView *showtextview;
 @property (weak) IBOutlet NSButton *pswBtn;

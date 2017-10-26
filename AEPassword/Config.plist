@@ -2,7 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>Choose1</key>
+	<string>http://172.31.56.165/AE</string>
+	<key>Choose2</key>
+	<string>http://10.42.222.70/AEOverlay/AEPassword.html</string>
 	<key>Backup</key>
-	<string>http://172.31.98.177</string>
+	<string>http://127.0.0.1/AE</string>
+	<key>SendSMS</key>
+	<false/>
+	<key>Tel</key>
+	<string>15705170905;15190138492</string>
 </dict>
 </plist>

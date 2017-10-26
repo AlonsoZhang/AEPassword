@@ -13,7 +13,61 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.showtextview setHidden:YES];
-    [self getWeb:@"https://172.31.63.232/AE"];
+    InfoConfig = [[NSMutableDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Config" ofType:@"plist"]];
+    [self getWeb:[InfoConfig objectForKey:@"Choose1"]];
+    updataTime = [NSTimer scheduledTimerWithTimeInterval:1
+                                                  target:self
+                                                selector:@selector(refresh)
+                                                userInfo:nil repeats:YES];
+}
+
+-(void)refresh{
+    NSDateFormatter *hourFormatter = [[NSDateFormatter alloc] init];
+    [hourFormatter setDateFormat:@"HH:mm:ss"];
+    NSDateFormatter *dayFormatter = [[NSDateFormatter alloc] init];
+    [dayFormatter setDateFormat:@"MM-dd"];
+    NSString *day = [NSString stringWithFormat:@"%@",[dayFormatter stringFromDate:[NSDate date]]];
+    NSString *hourDate = [NSString stringWithFormat:@"%@",[hourFormatter stringFromDate:[NSDate date]]];
+    if ([hourDate isEqualToString:@"10:00:01"]) {
+        [self getWeb:[InfoConfig objectForKey:@"Choose1"]];
+    }
+    if ([hourDate isEqualToString:@"10:00:10"]) {
+        if ([[InfoConfig objectForKey:@"SendSMS"]boolValue]) {
+            [self password];
+            NSString *returnmsg = [self PostURLForString:@"http://10.42.222.202/PESMS/sendsms.do" Cookie:@"" Postbody:[NSString stringWithFormat:@"tels=%@&texts=%@ AE Password:%@&submit=%%E5%%8F%%91%%E9%%80%%81",[InfoConfig objectForKey:@"Tel"],day,self.pswLabel.stringValue]];
+            if ([returnmsg containsString:@"OK"]) {
+                [self.showtextview setHidden:NO];
+                self.showtextview.string = [NSString stringWithFormat:@"%@ send pass",day];
+            }else{
+                [self.showtextview setHidden:NO];
+                self.showtextview.string = [NSString stringWithFormat:@"%@ send fail",day];
+            }
+        }
+    }
+}
+
+- (NSString*)PostURLForString:(NSString *)URL Cookie:(NSString *)Cookie Postbody:(NSString *)BODY
+{
+    //第一步，创建URL
+    NSURL *url = [NSURL URLWithString:  URL];
+    //第二步，创建请求
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15];
+    [request setHTTPMethod:@"POST"];//设置请求方式为POST，默认为GET
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
+    [request setValue:Cookie forHTTPHeaderField:@"Cookie"];
+    //设置参数
+    NSData *data = [BODY dataUsingEncoding:NSUTF8StringEncoding];
+    [request setHTTPBody:data];
+    //第三步，连接服务器
+    NSData *received = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    if(received != nil)
+    {
+        return  [[NSString alloc]initWithData:received encoding: NSUTF8StringEncoding ];
+    }
+    else
+    {
+        return nil;
+    }
 }
 
 - (void)setRepresentedObject:(id)representedObject {
@@ -37,6 +91,7 @@
                 [self.showtextview setHidden:NO];
                 [self.pswLabel setHidden:YES];
                 self.showtextview.string = error.localizedDescription;
+                [self getWeb:[InfoConfig objectForKey:@"Choose2"]];
             });
             return;
         }
@@ -68,7 +123,8 @@
     NSTimeZone *timeZone = [[NSTimeZone alloc] initWithName:@"Asia/Shanghai"];
     [calendar setTimeZone: timeZone];
     NSCalendarUnit calendarUnit = NSCalendarUnitEra | NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitWeekday | NSCalendarUnitWeekOfYear | NSCalendarUnitWeekOfMonth;
-    NSDateComponents *theComponents = [calendar components:calendarUnit fromDate:[NSDate date]];
+    NSDate * refreshDate = [NSDate dateWithTimeIntervalSinceNow:-10*60*60*1];
+    NSDateComponents *theComponents = [calendar components:calendarUnit fromDate:refreshDate];
     long weekday = (theComponents.weekday == 1) ? 7 : theComponents.weekday-1;
     long psw = labs((theComponents.year - theComponents.day*100 - theComponents.month)* weekday);
     //密码规则 |年份-日期月|*周几，ex：|2017-2010|*5=35转16进制23
@@ -110,8 +166,6 @@
 }
 
 - (IBAction)Btn:(NSButton *)sender {
-    NSMutableDictionary *InfoConfig = [[NSMutableDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Config" ofType:@"plist"]];
-    NSString *backupURL = [InfoConfig objectForKey:@"Backup"];
-    [self getWeb:backupURL];
+    [self getWeb:[InfoConfig objectForKey:@"Backup"]];
 }
 @end
