@@ -15,33 +15,30 @@
     [self.showtextview setHidden:YES];
     InfoConfig = [[NSMutableDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Config" ofType:@"plist"]];
     [self getWeb:[InfoConfig objectForKey:@"Choose1"]];
-    updataTime = [NSTimer scheduledTimerWithTimeInterval:1
-                                                  target:self
-                                                selector:@selector(refresh)
-                                                userInfo:nil repeats:YES];
+    if ([[InfoConfig objectForKey:@"SendSMS"]boolValue]) {
+        updataTime = [NSTimer scheduledTimerWithTimeInterval:60
+                                                      target:self
+                                                    selector:@selector(refresh)
+                                                    userInfo:nil repeats:YES];
+    }
 }
 
 -(void)refresh{
     NSDateFormatter *hourFormatter = [[NSDateFormatter alloc] init];
-    [hourFormatter setDateFormat:@"HH:mm:ss"];
-    NSDateFormatter *dayFormatter = [[NSDateFormatter alloc] init];
-    [dayFormatter setDateFormat:@"MM-dd"];
-    NSString *day = [NSString stringWithFormat:@"%@",[dayFormatter stringFromDate:[NSDate date]]];
+    [hourFormatter setDateFormat:@"HH:mm"];
     NSString *hourDate = [NSString stringWithFormat:@"%@",[hourFormatter stringFromDate:[NSDate date]]];
-    if ([hourDate isEqualToString:@"10:00:01"]) {
-        [self getWeb:[InfoConfig objectForKey:@"Choose1"]];
-    }
-    if ([hourDate isEqualToString:@"10:00:10"]) {
-        if ([[InfoConfig objectForKey:@"SendSMS"]boolValue]) {
-            [self password];
-            NSString *returnmsg = [self PostURLForString:@"http://10.42.222.202/PESMS/sendsms.do" Cookie:@"" Postbody:[NSString stringWithFormat:@"tels=%@&texts=%@ AE Password:%@&submit=%%E5%%8F%%91%%E9%%80%%81",[InfoConfig objectForKey:@"Tel"],day,self.pswLabel.stringValue]];
-            if ([returnmsg containsString:@"OK"]) {
-                [self.showtextview setHidden:NO];
-                self.showtextview.string = [NSString stringWithFormat:@"%@ send pass",day];
-            }else{
-                [self.showtextview setHidden:NO];
-                self.showtextview.string = [NSString stringWithFormat:@"%@ send fail",day];
-            }
+    if ([hourDate isEqualToString:@"10:00"]) {
+        [self password];
+        NSDateFormatter *dayFormatter = [[NSDateFormatter alloc] init];
+        [dayFormatter setDateFormat:@"MM-dd"];
+        NSString *day = [NSString stringWithFormat:@"%@",[dayFormatter stringFromDate:[NSDate date]]];
+        NSString *returnmsg = [self PostURLForString:[NSString stringWithFormat:@"http://10.42.21.9/sms?phones=%@&msg=%@%%20AE%%20Password:%@&secret=heric",[InfoConfig objectForKey:@"Tel"],day,self.pswLabel.stringValue] Cookie:@"" Postbody:@""];
+        if ([returnmsg containsString:@"all send seccess"]) {
+            [self.showtextview setHidden:NO];
+            self.showtextview.string = [NSString stringWithFormat:@"%@ send pass",day];
+        }else{
+            [self.showtextview setHidden:NO];
+            self.showtextview.string = [NSString stringWithFormat:@"%@ send fail,%@",day,returnmsg];
         }
     }
 }
@@ -52,12 +49,12 @@
     NSURL *url = [NSURL URLWithString:  URL];
     //第二步，创建请求
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15];
-    [request setHTTPMethod:@"POST"];//设置请求方式为POST，默认为GET
+    [request setHTTPMethod:@"GET"];//设置请求方式为POST，默认为GET
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
     [request setValue:Cookie forHTTPHeaderField:@"Cookie"];
     //设置参数
-    NSData *data = [BODY dataUsingEncoding:NSUTF8StringEncoding];
-    [request setHTTPBody:data];
+    //NSData *data = [BODY dataUsingEncoding:NSUTF8StringEncoding];
+    //[request setHTTPBody:data];
     //第三步，连接服务器
     NSData *received = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
     if(received != nil)
