@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Choose1</key>
-	<string>http://172.31.56.165/AE</string>
+	<string>http://localhost:8888/AE</string>
 	<key>Choose2</key>
 	<string>http://10.42.222.70/AEOverlay/AEPassword.html</string>
 	<key>Backup</key>
@@ -11,6 +11,6 @@
 	<key>SendSMS</key>
 	<false/>
 	<key>Tel</key>
-	<string>15705170905,15190138492,13773131130,15962620615,15895467182</string>
+	<string>15705170905</string>
 </dict>
 </plist>
