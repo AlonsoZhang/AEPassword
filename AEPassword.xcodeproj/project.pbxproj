@@ -277,7 +277,7 @@
 				INFOPLIST_FILE = AEPassword/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = wistron.AEPassword;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.zhangwu.AEPassword;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -292,7 +292,7 @@
 				INFOPLIST_FILE = AEPassword/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = wistron.AEPassword;
+				PRODUCT_BUNDLE_IDENTIFIER = tech.zhangwu.AEPassword;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
